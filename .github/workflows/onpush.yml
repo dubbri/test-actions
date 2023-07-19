@@ -1,0 +1,39 @@
+name: Deployment Workflow1
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Select the environment'
+        required: true
+        default: null
+        options:
+          - dev
+          - prd
+  push:
+    branches:
+      - main
+
+jobs:
+  common:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Common Step
+        run: echo "This is a common step for both environments"
+
+  dev:
+    needs: common
+    runs-on: ubuntu-latest
+    if: ${{ (github.event.inputs.environment == 'dev' || github.event_name == 'push') && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Say Hello
+        run: echo "Hello from the dev environment!"
+
+  prd:
+    needs: common
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.environment == 'prd' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Say Hello
+        run: echo "Hello from the prd environment!"
